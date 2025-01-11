@@ -7,38 +7,32 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 registerRootComponent(App);
 
 export default function App() {
-  const [stringKm, setStringKm] = useState<string>(''); // För att lagra kilometer
-  const [stringTaxa, setStringTaxa] = useState<string>(''); // För att lagra taxa
+  const [stringKm, setStringKm] = useState<string>('');
   const [km, setKm] = useState<number | undefined>();
-  const [taxa, setTaxa] = useState<number | undefined>();
 
   const blueColor = '#002684';
+  const taxa = 23.81;
+  const startingFee = 155;
 
-  const calculatePrice = () => {
-    let price;
-    if (km !== undefined && taxa !== undefined) {
-      price = taxa * km;
+  const calculatePrice = (): number | undefined => {
+    if (km !== undefined) {
+      const price = taxa * km + startingFee;
+
+      return Math.round(price);
     }
-    return price;
+    return undefined;
   };
 
   const handleInputKm = (input: string) => {
-    setStringKm(input.replace(/[^0-9]/g, ''));
-    const parsedValue = parseFloat(input);
+    const convertedInput = input.replace('.', ',');
+    setStringKm(convertedInput.replace(/[^0-9,]/g, ''));
+
+    const normalizedInput = convertedInput.replace(',', '.');
+    const parsedValue = parseFloat(normalizedInput);
     if (!isNaN(parsedValue)) {
       setKm(parsedValue);
     } else {
       setKm(undefined);
-    }
-  };
-
-  const handleInputTaxa = (input: string) => {
-    setStringTaxa(input.replace(/[^0-9]/g, ''));
-    const parsedValue = parseFloat(input);
-    if (!isNaN(parsedValue)) {
-      setTaxa(parsedValue);
-    } else {
-      setTaxa(undefined);
     }
   };
 
@@ -56,17 +50,8 @@ export default function App() {
           onChangeText={(input) => handleInputKm(input)}
           value={stringKm}
         />
-        <Text style={styles.description}>
-          Ange taxa <FontAwesome name="taxi" size={30} color={blueColor} />
-        </Text>
-        <TextInput
-          keyboardType="decimal-pad"
-          placeholder="taxa"
-          placeholderTextColor="grey"
-          style={styles.input}
-          onChangeText={(input) => handleInputTaxa(input)}
-          value={stringTaxa}
-        />
+        <Text style={styles.description}>Taxa: {taxa}</Text>
+        <Text style={styles.description}>Startkostnad: {startingFee} </Text>
         <Text style={styles.priceText}>
           Pris: <Text style={styles.amountText}>{calculatePrice()}</Text>
         </Text>
